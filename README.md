@@ -72,9 +72,9 @@
  * παραμένει ***system.clk_domain.clock*** = **1000**
  * ενώ ***system.cpu_clk_domain.clock*** = **1000**, **500** και **333** αντίστοιχα.
  
- Παρατηρώ ότι το flag **--cpu-clock** με το οποίο όρισα τα **1 / 3 GHz** αλλάζει το χρονισμό του πυρήνα μεμονομένα και όχι όλου του συστήματος, αφού και στα τρία έχουμε κοινό system clock = 1000 (default).  Το system clock θα επηρεαζόταν αντίστοιχα απο το flag **--sys-clock**.
+ Παρατηρώ ότι το flag **--cpu-clock** με το οποίο όρισα τα **1 ή 3 GHz** αλλάζει το χρονισμό του πυρήνα μεμονομένα και όχι όλου του συστήματος, αφού και στα τρία έχουμε κοινό system clock = 1000 (default).  Το system clock θα επηρεαζόταν αντίστοιχα απο το flag **--sys-clock**.
 
-Θεωρώ ότι ένας επιπρόσθετος επεξεργαστής θα ήταν χρονισμένος στο CPU Clock των **1 / 3 GHz**.
+Θεωρώ ότι ένας επιπρόσθετος επεξεργαστής θα ήταν χρονισμένος στο CPU Clock των **1 ή 3 GHz**.
 
  * **1GHz**: sim_seconds = **0.161025**
  * **2GHz**: sim_seconds = **0.083982**
@@ -84,7 +84,7 @@
 * **1GHz --> 2GHz** : *υποδιπλασιασμός* execution time - **καλό scaling**
 * **2GHz --> 3GHz**:  λιγότερο από *50% μείωση* στο execution time - **κακό scaling**
 
-*Amdahl's Law (question mark?)*
+Γενικά στον πραγματικό κόσμο **δεν** υπάρχει **πραγματικό καλό scaling**. 
 
 **4]** Διαμορφώνω το **memory configuration** με το flag **--mem-type** και το ορίζω **--mem-type = DDR3_2133_8x8** για να αλλάξω από τον default **DDR3_1600_x64** στον επιθυμητό **DDR3_2133_x64**. Τρέχω, χωρίς συγκεκριμένη προτίμηση, το benchmark **401.bzip2** σε *default CPU frequency* και συγκρίνω με το αρχικό benchmark (με *default mem type DDR3_1600_x64*).   
 
@@ -113,109 +113,140 @@
  * **429_opt_1**:  
 	 *  L1 Data Cache Size = 64kB
 	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 2048kB
 	 *  L1 Data Cache Associativity = 2
-	 *  L1 Instruction Cache Associativity = 4
+	 *  L1 Instruction Cache Associativity = 2
+	 *  Cacheline Size = 64
  * **429_opt_2**:  
 	 *  L1 Data Cache Size = 64kB
-	 *  L1 Instruction Cache Size = 128kB
+	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 1024kB
 	 *  L1 Data Cache Associativity = 2
-	 *  L1 Instruction Cache Associativity = 4
+	 *  L1 Instruction Cache Associativity = 2
+	 *  Cacheline Size = 64
  * **429_opt_3**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Instruction Cache Size = 128kB
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 2048kB
+	 *  L1 Data Cache Associativity = 4
+	 *  L1 Instruction Cache Associativity = 2
+	 *  Cacheline Size = 64
+ * **429_opt_4**:  
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 2048kB
 	 *  L1 Data Cache Associativity = 4
 	 *  L1 Instruction Cache Associativity = 4
- * **429_opt_4**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Instruction Cache Size = 128kB
-	 *  L1 Data Cache Associativity = 4
-	 *  L1 Instruction Cache Associativity = 8
+	 *  Cacheline Size = 64
  * **429_opt_5**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Instruction Cache Size = 128kB
-	 *  L1 Data Cache Associativity = 8
-	 *  L1 Instruction Cache Associativity = 8
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 32kB
+	 *  L2 Cache Size = 2048kB
+	 *  L1 Data Cache Associativity =4
+	 *  L1 Instruction Cache Associativity =4
+	 *  Cacheline Size = 64
 	
 Παρακάτω είναι ο πίνακας με τις επιδόσεις ανά optimization (**opt_1** - **opt_5**):
 														
 | 429                                | default benchmark | opt_1 | opt_2 | opt_3 | opt_4 | opt_5 |
 |------------------------------------|-------------------|-------|-------|-------|-------|-------|
-| **Execution time (seconds)**           |         0.064955          |   0.057772    |    0.057772   |  0.057746     |     0.057746  |    0.057746   |
-| **CPI**                                |       1.299095            |    1.155442   |     1.155442  | 1.154911      |     1.154911  |  1.154911     |
-| **Data Cache Total Miss Rate**         |         0.002108          |   0.002108    |   0.002108    | 0.001877      |   0.001877    |   0.001867    |
-| **Instruction Cache Total Miss Rate** |              0.023612     |     0.000018  | 0.000018     |0.000018       |    0.000018   |   0.000018    |
-| **L2 Total Miss Rate**                 |        0.055046           |    0.711974   |  0.711974     |     0.795458  |      0.795458 |    0.799414   |
+| **CPI**                                |       1.299095            |    1.155606|     1.160209| 1.155433|     1.155068|  1.155172|
+| **Data Cache Total Miss Rate**         |         0.002108          |   0.002108|   0.002108    | 0.001970|   0.001970|   0.001970    |
+| **Instruction Cache Total Miss Rate** |              0.023612     |     0.000018  | 0.000018     |0.000018       |    0.000018   |   0.000019    |
+| **L2 Total Miss Rate**                 |        0.055046           |    0.711878|  0.767534|     0.759903|      0.760014|    0.759883|
 
 Για τις **5** απόπειρες βελτιστοποίησης του **458** θα αλλάξουν τα εξής χαρακτηριστικά:
  * **458_opt_1**:  
 	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 2048kB
 	 *  L1 Data Cache Associativity = 4
-	 *  L2 Cache Size = 1MB
+	 *  L1 Instruction Cache Associativity = 4
+	 *  Cacheline Size = 64
  * **458_opt_2**:  
-	 *  L1 Data Cache Size = 128kB
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 1024kB
 	 *  L1 Data Cache Associativity = 4
-	 *  L2 Cache Size = 2MB
+	 *  L1 Instruction Cache Associativity = 4
+	 *  Cacheline Size = 64
  * **458_opt_3**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Data Cache Associativity = 4
-	 *  L2 Cache Size = 4MB
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 2048kB
+	 *  L1 Data Cache Associativity = 2
+	 *  L1 Instruction Cache Associativity = 2
+	 *  Cacheline Size = 64
  * **458_opt_4**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Instruction Cache Size = 128kB
-	 *  L1 Data Cache Associativity = 4
-	 *  L2 Cache Size = 4MB
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 32kB
+	 *  L2 Cache Size = 2048kB
+	 *  L1 Data Cache Associativity = 2
+	 *  L1 Instruction Cache Associativity = 2
+	 *  Cacheline Size = 32
  * **458_opt_5**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Instruction Cache Size = 128kB
-	 *  L1 Data Cache Associativity = 8
-	 *  L1 Instruction Cache Associativity = 8
-	 *  L2 Cache Size = 4MB
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 32kB
+	 *  L2 Cache Size = 2048kB
+	 *  L1 Data Cache Associativity = 2
+	 *  L1 Instruction Cache Associativity = 2
+	 *  Cacheline Size = 32
 
 Παρακάτω είναι ο πίνακας με τις επιδόσεις ανά optimization (**opt_1** - **opt_5**):
 
 | 458                                | default benchmark | opt_1 | opt_2 | opt_3 | opt_4 | opt_5 |
 |------------------------------------|-------------------|-------|-------|-------|-------|-------|
-| **Execution time (seconds)**           |       0.513528            |     0.513649  |    0.513536   | 0.513271      |  0.513274     |   0.513284    |
-| **CPI**                                |   10.270554                |  10.272975     |   10.270716    |    10.265417   |    10.265474   |    10.265673   |
-| **Data Cache Total Miss Rate**         |    0.121831               |    0.121831   |    0.121831   |  0.121831     |   0.121831    |    0.121831   |
-| **Instruction Cache Total Miss Rate** |          0.000020         |      0.000020 |    0.000020   |   0.000020    |      0.000019 |   0.000019    |
-| **L2 Total Miss Rate**                 |              0.999972     |    0.999978   |    0.999979   |  0.999979      |     0.999986    |   0.999986    |
+| **CPI**                                |   10.270554                |  10.270360|   10.273057|    10.270481|    17.653706|    17.653706|
+| **Data Cache Total Miss Rate**         |    0.121831               |    0.121831   |    0.121831   |  0.121831     |   0.243654|    0.243654   |
+| **Instruction Cache Total Miss Rate** |          0.000020         |      0.000019|    0.000019|   0.000019|      0.000023|   0.000023    |
+| **L2 Total Miss Rate**                 |              0.999972     |    0.999985|    0.999979   |  0.999979|     0.999988|   0.999988|
 
 
 Για τις **5** απόπειρες βελτιστοποίησης του **470** θα αλλάξουν τα εξής χαρακτηριστικά:
  * **470_opt_1**:  
 	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 2048kB
 	 *  L1 Data Cache Associativity = 4
-	 *  L2 Cache Size = 1MB
+	 *  L1 Instruction Cache Associativity = 4
+	 *  Cacheline Size = 64
  * **470_opt_2**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Data Cache Associativity = 4
-	 *  L2 Cache Size = 2MB
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 2048kB
+	 *  L1 Data Cache Associativity = 2
+	 *  L1 Instruction Cache Associativity = 4 
+	 *  Cacheline Size = 64
  * **470_opt_3**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Data Cache Associativity = 4
-	 *  L2 Cache Size = 4MB
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 64kB
+	 *  L2 Cache Size = 2048kB
+	 *  L1 Data Cache Associativity = 2
+	 *  L1 Instruction Cache Associativity = 2
+	 *  Cacheline Size = 64
  * **470_opt_4**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Instruction Cache Size = 128kB
-	 *  L1 Data Cache Associativity = 4
-	 *  L2 Cache Size = 4MB
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 32kB
+	 *  L2 Cache Size = 2048kB
+	 *  L1 Data Cache Associativity = 2
+	 *  L1 Instruction Cache Associativity = 2
+	 *  Cacheline Size = 64
  * **470_opt_5**:  
-	 *  L1 Data Cache Size = 128kB
-	 *  L1 Instruction Cache Size = 128kB
-	 *  L1 Data Cache Associativity = 8
-	 *  L1 Instruction Cache Associativity = 8
-	 *  L2 Cache Size = 4MB
+	 *  L1 Data Cache Size = 64kB
+	 *  L1 Instruction Cache Size = 32kB
+	 *  L2 Cache Size = 2048kB
+	 *  L1 Data Cache Associativity = 2
+	 *  L1 Instruction Cache Associativity = 2
+	 *  Cacheline Size = 128
 
 Παρακάτω είναι ο πίνακας με τις επιδόσεις ανά optimization (**opt_1** - **opt_5**):
 
 | 470                                | default benchmark | opt_1 | opt_2 | opt_3 | opt_4 | opt_5 |
 |------------------------------------|-------------------|-------|-------|-------|-------|-------|
-| **Execution time (seconds)**           |  0.174671                 |    0.174772   |   0.174671    | 0.174482      |  0.174479     |    0.174479   |
-| **CPI**                                |        3.493415           |  3.495444    |    3.493415   | 3.489639      |     3.489571  |    3.489571   |
-| **Data Cache Total Miss Rate**         |       0.060972            |    0.060972   |   0.060972    |    0.060972   |    0.060972   |     0.060972  |
-| **Instruction Cache Total Miss Rate** |       0.000094            |     0.000094  |  0.000094     |  0.000094     |      0.000085 |     0.000085  |
-| **L2 Total Miss Rate**                 |         0.999944          |     0.999945  |   0.999945    |0.999945       |     0.999982  |    0.999982   |
+| **CPI**                                |        3.493415           |  3.493293|    3.493293   | 3.493415|     3.493415|    2.581299|
+| **Data Cache Total Miss Rate**         |       0.060972            |    0.060972   |   0.060972    |    0.060972   |    0.060972   |     0.030487|
+| **Instruction Cache Total Miss Rate** |       0.000094            |     0.000085|  0.000085|  0.000088|      0.000094 |     0.000112  |
+| **L2 Total Miss Rate**                 |         0.999944          |     0.999979|   0.999979|0.999967|     0.999944|    0.999799|
 
 **2]** **ΧΧΧ**
 
